@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "project_id": "agent-board-demo",
+  "name": "示例项目",
+  "type": "writing",
+  "summary": "体验从看板领取任务到回写执行结果。",
+  "status": "active",
+  "stage": "试用",
+  "updated_at": "2026-01-01T00:00:00+00:00",
+  "entry_path": "README.md",
+  "next_task_id": "T001",
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "整理试用记录",
+      "status": "todo",
+      "detail_path": "management/tasks/T001.md"
+    }
+  ]
+}

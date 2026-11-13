@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f6ef">
+  <title>智能体看板</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>智能体看板</span></a>
+      <nav aria-label="项目导航">
+        <a class="nav-link" id="overview-link" href="#overview"><span class="nav-grid" aria-hidden="true"></span>项目总览</a>
+        <div class="nav-label">项目</div>
+        <div id="project-nav"></div>
+      </nav>
+      <div class="sidebar-foot"><span class="live-dot"></span> 本地工作区</div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <a class="brand mobile-brand" href="#overview"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>智能体看板</span></a>
+        <div class="breadcrumb"><span>工作区</span><span class="separator" aria-hidden="true">/</span><strong id="breadcrumb-current">项目总览</strong></div>
+        <div class="topbar-actions">
+          <button class="button button-quiet" id="refresh" type="button" aria-label="刷新数据" title="刷新数据"><span class="button-symbol" aria-hidden="true">↻</span><span class="refresh-label">刷新</span></button>
+          <button class="button button-quiet" id="open-appearance" type="button" aria-haspopup="dialog"><span class="appearance-icon" aria-hidden="true"></span>外观</button>
+        </div>
+      </header>
+      <div class="mobile-projects"><select id="project-picker" aria-label="切换项目"><option value="">项目总览</option></select></div>
+      <main id="main">
+        <div id="message" class="notice" role="status" hidden></div>
+        <div id="content" aria-live="polite"><p class="loading">正在读取项目…</p></div>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="directories-dialog" class="directories-dialog" aria-labelledby="directories-title">
+    <div class="dialog-top"><h2 id="directories-title">选择项目目录</h2><button class="icon-button" type="button" data-close aria-label="关闭目录选择">×</button></div>
+    <div class="dialog-body directories-body">
+      <p class="muted">勾选一个或多个目录，扫描其中的项目索引。</p>
+      <form id="directory-address" class="directory-address">
+        <input type="text" id="directory-path" aria-label="目录路径" placeholder="输入本机目录路径" required>
+        <button class="button" type="submit">打开</button>
+      </form>
+      <div class="directory-tools">
+        <button class="button" id="directory-parent" type="button">返回上一级</button>
+        <label class="directory-current"><input type="checkbox" id="directory-current" disabled>选择当前目录</label>
+      </div>
+      <div id="directory-list" class="directory-list" aria-label="子目录"></div>
+      <section id="registered-directories" class="registered-directories" hidden>
+        <h3>已加入的目录</h3>
+        <ul id="registered-directory-list" class="directory-list"></ul>
+        <p class="muted">移除只取消在看板中的登记。</p>
+      </section>
+      <p id="directory-message" class="form-error" role="alert" hidden></p>
+    </div>
+    <div class="dialog-footer"><span class="copy-status" id="directory-count" role="status"></span><button class="button button-primary" id="scan-directories" type="button" disabled>扫描并加入</button></div>
+  </dialog>
+
+  <dialog id="appearance-dialog" class="appearance-dialog" aria-labelledby="appearance-title">
+    <div class="dialog-top"><h2 id="appearance-title">外观设置</h2><button class="icon-button" type="button" data-close aria-label="关闭外观设置">×</button></div>
+    <div class="dialog-body">
+      <fieldset class="theme-options">
+        <legend>选择主题</legend>
+        <label class="theme-option"><input type="radio" name="theme" value="paper"><span class="theme-preview theme-paper" aria-hidden="true"><i></i><i></i><i></i></span><span>苔绿浅色</span></label>
+        <label class="theme-option"><input type="radio" name="theme" value="blue"><span class="theme-preview theme-blue" aria-hidden="true"><i></i><i></i><i></i></span><span>雾蓝浅色</span></label>
+        <label class="theme-option"><input type="radio" name="theme" value="dark"><span class="theme-preview theme-dark" aria-hidden="true"><i></i><i></i><i></i></span><span>墨色深色</span></label>
+        <label class="theme-option"><input type="radio" name="theme" value="system"><span class="theme-preview theme-system" aria-hidden="true"><i></i><i></i><i></i></span><span>跟随系统</span></label>
+      </fieldset>
+    </div>
+  </dialog>
+
+  <dialog id="task-dialog" class="drawer" aria-labelledby="task-title">
+    <div class="dialog-top"><span class="eyebrow" id="task-project"></span><button class="icon-button" type="button" data-close aria-label="关闭任务详情">×</button></div>
+    <div class="dialog-body">
+      <div id="task-meta" class="task-meta"></div>
+      <h2 id="task-title"></h2>
+      <div id="task-body" class="prose"></div>
+    </div>
+    <div class="dialog-footer"><span class="copy-status" id="copy-status" role="status"></span><button class="button button-primary" id="copy-command" type="button">复制 Codex 指令</button></div>
+  </dialog>
+
+  <dialog id="create-dialog" class="create-dialog" aria-labelledby="create-title">
+    <div class="dialog-top"><span class="eyebrow" id="create-project"></span><button class="icon-button" type="button" data-close aria-label="关闭新建任务">×</button></div>
+    <form id="create-form">
+      <div class="dialog-body">
+        <h2 id="create-title">新建任务</h2>
+        <label>标题（必填）<input name="title" required maxlength="120" placeholder="例如：核对首批项目索引"></label>
+        <label>工作范围（选填）<textarea name="scope" maxlength="3000" rows="3"></textarea></label>
+        <label>验收条件（选填）<textarea name="acceptance" maxlength="3000" rows="3"></textarea></label>
+        <label class="checkbox"><input type="checkbox" name="set_next">设为项目的下一项任务</label>
+        <p class="form-error" id="create-error" role="alert" hidden></p>
+      </div>
+      <div class="dialog-footer"><button class="button" type="button" data-close>取消</button><button class="button button-primary" type="submit">保存任务</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

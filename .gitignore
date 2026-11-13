@@ -1,0 +1,5 @@
+__pycache__/
+.project-directories.json
+.project-directories.lock
+.project-directories.damaged-*
+examples/demo/management/.project-init.lock
